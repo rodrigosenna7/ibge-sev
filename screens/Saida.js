@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import { StyleSheet, Text, View,TextInput, TouchableOpacity, Button} from 'react-native';
 import firebase from '../firebaseConfig';
-import movimentService from '../service/MovimentService'
 import { styles } from '../assets/Style';
+import Menutopo from '../components/Menutopo';
+
 
 
 
@@ -52,11 +53,9 @@ export default function Saida ({navigation}){
     }
   
       return(
-        <View style={styles.container}>
-           
-
+        <View>
+            <Menutopo title='Iniciar deslocamento' navigation={navigation}/>
             <View>
-
             <Text style={styles.txtregular}>Finalidade</Text>
                 <TextInput 
                     style={styles.inputs}

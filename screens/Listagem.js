@@ -12,8 +12,6 @@ const wait = (timeout) => {
 export default function Listagem ({ navigation }){
 
     const [refreshing, setRefreshing] = React.useState(false);
-    const [veiculoSelecionado, setVeiculoSelecionado] = useState({});
-
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -43,9 +41,9 @@ export default function Listagem ({ navigation }){
         return () => ref()
     }, [])
     
-    const showVeiculo = (item) => {
+    const showDetalhe = (item) => {
         setDetalhe (true)
-        setVeiculoSelecionado (item)
+        setAtividadeSelecionada (item)
     }
 
     return(  

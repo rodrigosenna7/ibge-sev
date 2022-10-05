@@ -3,6 +3,8 @@ import { Text, View, RefreshControl,FlatList, StyleSheet,TouchableOpacity } from
 import firebase from '../firebaseConfig';
 import {FontAwesome ,Entypo, MaterialIcons , Feather } from '@expo/vector-icons';
 import { styles } from '../assets/Style';
+import Menutopo from '../components/Menutopo';
+
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -37,7 +39,8 @@ useEffect(() =>{
 }, [])
     
 return(    
-    <View style={styles.container}>
+    <View>
+        <Menutopo title='Veiculos' navigation={navigation}/>
         <View>
             <FlatList
                 refreshControl={
