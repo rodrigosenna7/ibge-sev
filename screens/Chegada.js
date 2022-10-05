@@ -4,16 +4,42 @@ import firebase from '../firebaseConfig';
 
 
 
-export default function Chegada (){
+export default function Chegada ({navigation}){
 
-    
+    const [siape, setSiape] =useState (navigation.getParam('siape'));
+    const [datas, setDatas] = useState(navigation.getParam('datas'));
+    const [horas, setHoras] = useState(navigation.getParam('horas'));
+    const [kminicio, setKminicio] = useState(navigation.getParam('kminicio'));
+    const [finalidade, setFinalidade] = useState(navigation.getParam('finalidade'));
    
     const [datac, setDatac] = useState('');
     const [horac, setHorac] = useState('');
     const [kmfinal, setKmfinal] = useState('');
+    const [veiculo, setVeiculo] = useState('');
     const [observacao, setObservacao] = useState('');
         
-   
+    const onChangeSiape = (txtSiape) =>{
+        setSiape(txtSiape)
+      }
+    
+    const onChangeDatas = (txtDatas) =>{
+      setDatas(txtDatas)
+    }
+    
+    const onChangeHoras = (txtHoras) =>{
+      setHoras(txtHoras)
+    }
+
+    const onChangeKminicio = (txtKminicio) =>{
+        setKminicio(txtKminicio)
+    }
+    const onChangeVeiculo = (txtVeiculo) =>{
+        setVeiculo(txtVeiculo)
+    }
+    
+    const onChangeFinalidade = (txtFinalidade) =>{
+        setFinalidade(txtFinalidade)
+    }
     
     const onChangeDatac = (txtDatac) =>{
       setDatac(txtDatac)
@@ -31,11 +57,42 @@ export default function Chegada (){
         setObservacao(txtObservacao)
     }
 
+    function upDateFire() {
+        try {
+          firebase.database().ref('/moviment/'+navigation.getParam('key')).update({
+            siape: siape,
+            datas: datas,
+            horas: horas,
+            veiculo:veiculo,
+            kminicio: kminicio,
+            finalidade: finalidade,
+            datac:datac,
+            horac:horac,
+            kmfinal:kmfinal,
+            observacao:observacao,
+          })
     
+        } catch (error) {
+          alert(error);
+        }
+        finally {
+            setSiape('');
+            setDatas('');
+            setHoras('');
+            setKminicio('');
+            setFinalidade('');
+            setVeiculo('');
+            setDatac('');
+            setHorac('');
+            setKmfinal('');
+            setObservacao('');
+          navigation.navigate("Listagem")
+        }
+      }
    
     function pushFirebase () {
         try{
-            firebase.firestore().collection('deslocamento').add({
+            firebase.firestore().collection('moviment').add({
              
               datac: datac,
               horac: horac,
@@ -46,7 +103,12 @@ export default function Chegada (){
             alert(error)
         }
         finally{
-            
+            setSiape('');
+            setDatas('');
+            setHoras('');
+            setKminicio('');
+            setFinalidade('');
+            setVeiculo('');
             setDatac('');
             setHorac('');
             setKmfinal('');
@@ -60,35 +122,66 @@ export default function Chegada (){
            
 
             <View>
+            <TextInput
+                        style={styles.input}
+                        onChangeText={siape=> onChangeSiape(siape)} 
+                        value={siape}
+                       
+                />
 
+                <TextInput
+                    style={styles.input}
+                    onChangeText={datas => onChangeDatas(datas)} 
+                    value={datas}
+                />
+
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={hHoras => onChangeHoras(horas)} 
+                        value={horas}
+                     />
+
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={txtkminicio => onChangeKminicio(kminicio)} 
+                    value={kminicio}
+                  
+                 />
+                 <TextInput
+                        style={styles.input}
+                        onChangeText={veiculo => onChangeVeiculo(veiculo)} 
+                        value={veiculo}
+                    />
+
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={finalidade => onChangeFinalidade(finalidade)} 
+                        value={finalidade}
+                    />
                 
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Data Chegada"
-                    onChangeText={txtDatac => onChangeDatac(txtDatac)} 
+                    onChangeText={datac => onChangeDatac(txtdatac)} 
                     value={datac}
                 />
 
                     <TextInput
                         style={styles.input}
-                        placeholder="Hora Chegada"
-                        onChangeText={txtHorac => onChangeHorac(txtHorac)} 
+                        onChangeText={horac => onChangeHorac(horac)} 
                         value={horac}
                      />
 
                   <TextInput
                     style={styles.input}
-                    placeholder="Km Final"
-                    onChangeText={txtKmfinal => onChangeKmfinal(txtKmfinal)} 
+                    onChangeText={kmfinal => onChangeKmfinal(kmfinal)} 
                     value={kmfinal}
-                    keyboardType='numeric'
+                  
                  />
 
                     <TextInput
                         style={styles.input}
-                        placeholder="Observação"
-                        onChangeText={txtObservacao => onChangeObservacao(txtObservacao)} 
+                        onChangeText={observacao => onChangeObservacao(observacao)} 
                         value={observacao}
                     />
 
@@ -98,7 +191,7 @@ export default function Chegada (){
             <View>
                 <TouchableOpacity 
                     style={styles.botao}
-                    onPress={() => {pushFirebase()}}
+                    onPress={() => {upDateFire()}}
                     >
                         <Text style={{color:'#fff'}}>Salvar</Text>
                 </TouchableOpacity>

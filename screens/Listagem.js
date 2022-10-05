@@ -1,6 +1,9 @@
 import React ,{useState,useEffect} from 'react';
-import { Text, View, RefreshControl,FlatList, StyleSheet } from 'react-native';
+import { Text, View, RefreshControl,FlatList, StyleSheet,TouchableOpacity } from 'react-native';
 import firebase from '../firebaseConfig';
+import {Entypo,MaterialCommunityIcons,FontAwesome, MaterialIcons , Feather } from '@expo/vector-icons';
+import { styles } from '../assets/Style';
+import Menutopo from '../components/Menutopo';
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -9,6 +12,8 @@ const wait = (timeout) => {
 export default function Listagem ({ navigation }){
 
     const [refreshing, setRefreshing] = React.useState(false);
+    const [veiculoSelecionado, setVeiculoSelecionado] = useState({});
+
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -17,8 +22,15 @@ export default function Listagem ({ navigation }){
 
     const [data, setData] = useState('');
 
+    
+      
+
     useEffect(() =>{
-        let ref = firebase.firestore().collection('deslocamento').onSnapshot(querySnapshot =>{
+        let ref = firebase.firestore()
+        .collection('veiculo')
+        .doc('veiculoId')
+        .collection('moviment')
+        .onSnapshot(querySnapshot =>{
         const data = []
             querySnapshot.forEach(doc =>{
                 data.push({
@@ -30,15 +42,25 @@ export default function Listagem ({ navigation }){
     })
         return () => ref()
     }, [])
-
     
+    const showVeiculo = (item) => {
+        setDetalhe (true)
+        setVeiculoSelecionado (item)
+    }
 
-    return(    
-        <View style={styles.container}>
-                     
-
+    return(  
+        <View >
+        <Menutopo title='Deslocamentos' navigation={navigation}/>
             <View>
-            <Text style={[styles.txtDark,styles.subTitledark]}>Finalidade:</Text>
+            <View >
+                    <TouchableOpacity
+                        onPress={() => {navigation.navigate('Saida')}}
+                        style={styles.row}
+                    >
+                        <Entypo name="squared-plus" size={35} color="black" />
+                        <Text>Novo deslocamento</Text>
+                    </TouchableOpacity>
+                </View>
                 <FlatList
                     refreshControl={
                         <RefreshControl
@@ -50,107 +72,34 @@ export default function Listagem ({ navigation }){
                     showsVerticalScrollIndicator={false}
                     data={data}
                     renderItem={({item})=>(
-                        
-                        <View style={[styles.borda, styles.blocoLight]}>
-
-                               
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Siape</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.siape}</Text>
-                            </View>
-                            <View style={styles.linha}>
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Finalidade:</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.finalidade}</Text>
-                            </View>
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Data Saida:</Text>
-                                <Text style={[styles.txtDark,styles.subTitledark]}>{item.datas}</Text>
-                            </View>
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Hora de Saida:</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.horas}</Text>
-                            </View>
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Km Inicio:</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.kminicio}</Text>
-                            </View>
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Data Chegada:</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.datac}</Text>
-                            </View>
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Hora Chegada:</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.horac}</Text>
-                            </View>
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Km Final:</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.kmfinal}</Text>
-                            </View>
-                            <View style={styles.linha} >
-                                <Text style={[styles.txtDark,styles.subTitledark]}>Observações:</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.observacao}</Text>
-                                <Text style={[styles.txtDark, styles.subTitledark]}>{item.post}</Text>
-                            </View>
-                        </View>
-                        
+                    <View style={styles.bigbox}>
+                        <View>
+                        <Text style={styles.negrito}>Finalidade: {item.finalidade}</Text>
+                        <Text>Saída: {item.dataInicio}</Text>
+                        <Text>Hora Saída: {item.horaInicio}</Text>
+                        <Text>KM Saída: {item.kmInicio}</Text>
+                        <Text>Data Chegada: {item.dataFim}</Text>
+                        <Text>Hora Chegada: {item.horaFim}</Text>
+                        <Text>KM Chegada: {item.kmFim}</Text>
+                        <Text>Observação: {item.obs}</Text>
+                    </View>
+                    <View style={styles.box}>
+                        <TouchableOpacity style={styles.row} onPress={() => { editFire(item.key, item.siape, item.finalidade) }}>
+                            <FontAwesome name="stop-circle" size={24} color="black" />
+                            <Text style={styles.text}> Finalizar</Text>
+                        </TouchableOpacity>
+                    
+                        <TouchableOpacity style={styles.row} onPress={() => { delFire(item.key) }}>
+                            <MaterialCommunityIcons name="delete-circle" size={24} color="black" />
+                            <Text style={styles.text}> Excluir</Text>
+                        </TouchableOpacity>
+                    </View>
+                    </View>
                     )}
                 />
-                
             </View>
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-
-    container:{
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }, 
-
-    txtDark:{
-        color:'#13293D', 
-        fontSize:17,
-        textAlign:'justify',
-    },
-
-    boletimdia:{
-        textAlign:'center',
-        fontSize:25,
-        fontWeight:'bold',
-        backgroundColor:'#13293D',
-        borderTopLeftRadius:5,
-        borderTopRightRadius:5,
-        color:'white'
-        
-    },
-
-    subTitledark:{
-        color:'#13293D',
-        textAlign:'left',
-        fontSize:25,
-    },
-
-    blocoLight:{
-        backgroundColor:'#E8F1F2', 
-        padding:10
-    },
-
-    borda:{
-        borderWidth:1,
-        borderRadius:5,
-        borderColor:'#E8F1F2',
-        margin:10
-    },
-    linha:{
-        borderBottomWidth:1,
-        borderColor:'#247BA0',
-        flexDirection:'row', 
-        justifyContent:'space-between',
-        paddingTop:10
-    },
-
-})
 

@@ -1,61 +1,53 @@
 import React, {useState, useEffect} from 'react';
 import { StyleSheet, Text, View,TextInput, TouchableOpacity, Button} from 'react-native';
 import firebase from '../firebaseConfig';
+import movimentService from '../service/MovimentService'
+import { styles } from '../assets/Style';
 
 
 
 
-export default function Saida (){
+
+export default function Saida ({navigation}){
 
     
-    const [siape, setSiape] =useState ('');
-    const [datas, setDatas] = useState('');
-    const [horas, setHoras] = useState('');
-    const [kminicio, setKminicio] = useState('');
     const [finalidade, setFinalidade] = useState('');
-        
-    
-    const onChangeSiape = (txtSiape) =>{
-        setSiape(txtSiape)
-      }
-    
-    const onChangeDatas = (txtDatas) =>{
-      setDatas(txtDatas)
-    }
-    
-    const onChangeHoras = (txtHoras) =>{
-      setHoras(txtHoras)
-    }
+    const [dataInicio, setDataInicio] = useState('');
+    const [horaInicio, setHoraInicio] = useState('');
+    const [kmInicio, setKmInicio]= useState('');
 
-    const onChangeKminicio = (txtKminicio) =>{
-        setKminicio(txtKminicio)
-    }
-    
     const onChangeFinalidade = (txtFinalidade) =>{
         setFinalidade(txtFinalidade)
-    }
+      }
+      const onChangeDataInicio = (txtDataInicio) =>{
+        setDataInicio(txtDataInicio)
+      }
+      const onChangeHoraInicio = (txtHoraInicio) =>{
+        setHoraInicio(txtHoraInicio)
+      }
+      const onChangeKmInicio = (txtKmInicio) =>{
+        setKmInicio(txtKmInicio)
+      }
 
-    
+
    
     function pushFirebase () {
         try{
-            firebase.firestore().collection('deslocamento').add({
-              siape: siape,
-              datas: datas,
-              horas: horas,
-              kminicio: kminicio,
-              finalidade: finalidade
+            firebase.firestore().collection('veiculo').doc('veiculoId').collection('moviment').add({
+                finalidade: finalidade,
+                dataInicio: dataInicio,
+                horaInicio: horaInicio,
+                kmInicio: kmInicio,
             })
         }catch (error){
             alert(error)
         }
         finally{
-            setSiape('');
-            setDatas('');
-            setHoras('');
-            setKminicio('');
             setFinalidade('');
-          
+            setDataInicio('');
+            setHoraInicio('');
+            setKmInicio('');
+           navigation.navigate("Listagem")
         }
     }
   
@@ -65,98 +57,55 @@ export default function Saida (){
 
             <View>
 
-                <TextInput
-                        style={styles.input}
-                        placeholder="Siape"
-                        onChangeText={txtSiape=> onChangeSiape(txtSiape)} 
-                        value={siape}
-                        keyboardType='numeric'
-                        maxLength={59}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Data Saída"
-                    onChangeText={txtDatas => onChangeDatas(txtDatas)} 
-                    value={datas}
-                />
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Hora Saída"
-                        onChangeText={txtHoras => onChangeHoras(txtHoras)} 
-                        value={horas}
-                     />
-
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Km Inicial"
-                    onChangeText={txtKminicio => onChangeKminicio(txtKminicio)} 
-                    value={kminicio}
-                    keyboardType='numeric'
-                 />
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Finalidade"
-                        onChangeText={txtFinalidade => onChangeFinalidade(txtFinalidade)} 
-                        value={finalidade}
-                    />
-
-                    
-            </View>
-
-            <View>
-                <TouchableOpacity 
-                    style={styles.botao}
-                    onPress={() => {pushFirebase()}}
-                    >
-                        <Text style={{color:'#fff'}}>Salvar</Text>
+            <Text style={styles.txtregular}>Finalidade</Text>
+                <TextInput 
+                    style={styles.inputs}
+                    placeholder='Motivo do deslocamento' 
+                    onChangeText={txtFinalidade => onChangeFinalidade(txtFinalidade)} 
+                    value={finalidade}
+                >
+                </TextInput>
+                <Text style={styles.txtregular}>Data Inicio</Text>
+                <TextInput 
+                    style={styles.inputs}
+                    placeholder='00/00/0000' 
+                    onChangeText={txtDataInicio => onChangeDataInicio(txtDataInicio)} 
+                    value={dataInicio}
+                    keyboardType={'numeric'}
+                >
+            </TextInput>
+            <Text style={styles.txtregular}>Hora Inicio</Text>
+                <TextInput 
+                    style={styles.inputs}
+                    placeholder='00:00' 
+                    onChangeText={txtHoraInicio => onChangeHoraInicio(txtHoraInicio)} 
+                    value={horaInicio}
+                    keyboardType={'numeric'}
+                >
+            </TextInput>
+            <Text style={styles.txtregular}>KM Inicio</Text>
+                <TextInput 
+                    style={styles.inputs}
+                    placeholder='12345' 
+                    onChangeText={txtKmInicio => onChangeKmInicio(txtKmInicio)} 
+                    value={kmInicio}
+                    keyboardType={'numeric'}
+                >
+            </TextInput>
+            <View style={styles.buttonpstv}>
+                <TouchableOpacity onPress={() => {pushFirebase()}}>
+                        <Text style={styles.txtbutton}>INICIAR DESLOCAMENTO</Text>
                 </TouchableOpacity>
             </View>
+            </View>
 
+           
+            
+                
+          
+   
 
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container:{
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    input:{
-        width:'100%',
-        borderWidth:1,
-        borderColor:'#000',
-        padding:10,
-        borderRadius:10,
-        width:300,
-        marginTop:10
-    },
-
-    inputnum:{
-        width:100,
-        borderWidth:1,
-        borderColor:'#000',
-        padding:10,
-        borderRadius:10,
-        marginTop:10
-    },
-
-    botao:{
-        backgroundColor:"#F33329",
-        width:'100%',
-        height:45,
-        alignItems:'center',
-        justifyContent:'center',
-        borderRadius:7,
-        paddingLeft:30,
-        paddingRight:30,
-        marginTop:15
-    },
- 
-})
