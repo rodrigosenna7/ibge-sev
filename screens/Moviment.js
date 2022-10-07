@@ -9,26 +9,35 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   }
 
-export default function Listagem ({ navigation }){
+export default function Moviment ({ navigation, item }){
 
     const [refreshing, setRefreshing] = React.useState(false);
+    const user_id = firebase.auth().currentUser.uid
+    const [data, setData] = useState('');
+
+    const [finalidade, setFinalidade] = useState('');
+    const [veiculo, setVeiculo] = useState('');
+    const [dataInicio, setDataInicio] = useState('');
+    const [horaInicio, setHoraInicio] = useState('');
+    const [kmInicio, setKmInicio]= useState('');
+    const [dataFim, setDataFim] = useState('');
+    const [horaFim, setHoraFim] = useState('');
+    const [kmFim, setKmFim]= useState('');
+    const [obs, setObs]= useState('');
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     wait(1000).then(() => setRefreshing(false));
   }, []);
-
-    const [data, setData] = useState('');
-
     
-      
+
+ 
 
     useEffect(() =>{
         let ref = firebase.firestore()
-        .collection('veiculo')
-        .doc('veiculoId')
-        .collection('moviment')
-        .onSnapshot(querySnapshot =>{
+    .collection('moviment')
+    .where("user_id", "==", user_id)
+    .onSnapshot(querySnapshot =>{
         const data = []
             querySnapshot.forEach(doc =>{
                 data.push({
@@ -41,15 +50,47 @@ export default function Listagem ({ navigation }){
         return () => ref()
     }, [])
     
-    const showDetalhe = (item) => {
-        setDetalhe (true)
-        setAtividadeSelecionada (item)
+    useEffect(() =>{
+        setVeiculo (item)
+        console.log (item)
+    }, [item])
+
+    function delFirebase () {
+        try{
+            firebase.firestore().collection('moviment').doc(user_id).del({
+                finalidade, 
+                veiculo,
+                dataInicio, 
+                horaInicio,
+                kmInicio,
+                user_id:user_id
+            })
+        }catch (error){
+            alert(error)
+        }
+        
+    }
+    
+    function update (){
+        firebase.firestore().collection('moviment').doc(user_id).update({
+            finalidade,
+            dataInicio,
+            horaInicio,
+            kmInicio,
+            dataFim,
+            horaFim,
+            kmFim,
+            obs,
+            user_id:user_id
+            });
     }
 
     return(  
         <View >
         <Menutopo title='Deslocamentos' navigation={navigation}/>
             <View>
+                <View style={styles.cabeçalho}>
+                </View>
             <View >
                     <TouchableOpacity
                         onPress={() => {navigation.navigate('Saida')}}
@@ -73,6 +114,7 @@ export default function Listagem ({ navigation }){
                     <View style={styles.bigbox}>
                         <View>
                         <Text style={styles.negrito}>Finalidade: {item.finalidade}</Text>
+                        <Text style={styles.negrito}>Veiculo: {item.veiculo}</Text>
                         <Text>Saída: {item.dataInicio}</Text>
                         <Text>Hora Saída: {item.horaInicio}</Text>
                         <Text>KM Saída: {item.kmInicio}</Text>
@@ -82,14 +124,14 @@ export default function Listagem ({ navigation }){
                         <Text>Observação: {item.obs}</Text>
                     </View>
                     <View style={styles.box}>
-                        <TouchableOpacity style={styles.row} onPress={() => { editFire(item.key, item.siape, item.finalidade) }}>
+                        <TouchableOpacity style={styles.row} onPress={() => {update() }}>
                             <FontAwesome name="stop-circle" size={24} color="black" />
-                            <Text style={styles.text}> Finalizar</Text>
+                            <Text> Finalizar</Text>
                         </TouchableOpacity>
                     
-                        <TouchableOpacity style={styles.row} onPress={() => { delFire(item.key) }}>
+                        <TouchableOpacity style={styles.row} onPress={() => {delFirebase()}}>
                             <MaterialCommunityIcons name="delete-circle" size={24} color="black" />
-                            <Text style={styles.text}> Excluir</Text>
+                            <Text> Excluir</Text>
                         </TouchableOpacity>
                     </View>
                     </View>
